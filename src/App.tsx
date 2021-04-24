@@ -32,7 +32,6 @@ const App: React.FC<Props> = (props = {}) => {
     const toolRect = wrapRef.current
       ?.querySelector('.toolbar-wrap')
       ?.getBoundingClientRect?.();
-
     wrapRect &&
       setCanvasSize({
         width: wrapRect.width - (toolRect?.width ?? 196),

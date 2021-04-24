@@ -74,6 +74,7 @@ export const usePainter = ({
     (e: MouseEvent) => {
       isDrawing.current = true;
       [lastX.current, lastY.current] = [e.offsetX, e.offsetY];
+      drawNormal(e);
     },
     [canvas]
   );
@@ -131,10 +132,10 @@ export const usePainter = ({
 
   const init = useCallback(() => {
     if (canvas && ctx.current) {
-      canvas?.addEventListener('mousedown', handleMouseDown);
-      canvas?.addEventListener('mousemove', drawNormal);
-      canvas?.addEventListener('mouseup', stopDrawing);
-      canvas?.addEventListener('mouseout', stopDrawing);
+      canvas.addEventListener('mousedown', handleMouseDown);
+      canvas.addEventListener('mousemove', drawNormal);
+      canvas.addEventListener('mouseup', stopDrawing);
+      canvas.addEventListener('mouseout', stopDrawing);
       canvas.width = Math.min(canvasWidth, maxCanvasWidth);
       canvas.height = Math.min(canvasHeight, maxCanvasHeight);
       ctx.current.strokeStyle = defaultColor;
@@ -143,6 +144,15 @@ export const usePainter = ({
       ctx.current.lineWidth = defaultCursorWidth;
       setIsReady(true);
     }
+
+    return () => {
+      if (canvas) {
+        canvas.removeEventListener('mousedown', handleMouseDown);
+        canvas.removeEventListener('mousemove', drawNormal);
+        canvas.removeEventListener('mouseup', stopDrawing);
+        canvas.removeEventListener('mouseout', stopDrawing);
+      }
+    };
   }, [drawNormal, handleMouseDown, stopDrawing, canvas]);
 
   const handleRegularMode = useCallback(() => {
