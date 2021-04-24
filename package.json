@@ -15,7 +15,7 @@
     "dev": "tsdx watch",
     "build": "tsdx build",
     "test": "tsdx test --passWithNoTests",
-    "lint": "tsdx lint",
+    "lint": "tsdx lint src",
     "prepare": "tsdx build",
     "storybook": "start-storybook -p 6006",
     "sb": "start-storybook -p 6006",
@@ -67,7 +67,6 @@
     "@fortawesome/react-fontawesome": "^0.1.14",
     "less": "^4.1.1",
     "normalize.css": "^8.0.1",
-    "postcss": "^8.2.12",
     "postcss-modules": "^4.0.0",
     "rollup-plugin-postcss": "^4.0.0"
   }

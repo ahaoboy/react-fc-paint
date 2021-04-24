@@ -1,9 +1,23 @@
 import { useEffect } from 'react';
 import { useCallback, useRef, useState } from 'react';
-type Props = {
+export type Props = {
   bgColor?: string;
+  defaultColor?: string;
+  defaultCursorWidth?: number;
+  canvasWidth?: number;
+  canvasHeight?: number;
+  maxCanvasWidth?: number;
+  maxCanvasHeight?: number;
 };
-export const usePainter = ({ bgColor = 'white' }: Props = {}) => {
+export const usePainter = ({
+  bgColor = 'white',
+  defaultColor = 'black',
+  defaultCursorWidth = 15,
+  canvasWidth = window.innerWidth - 196,
+  canvasHeight = window.innerHeight,
+  maxCanvasWidth = 1024 * 4,
+  maxCanvasHeight = 1024 * 2,
+}: Props = {}) => {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | undefined>(
     undefined
   );
@@ -13,14 +27,14 @@ export const usePainter = ({ bgColor = 'white' }: Props = {}) => {
   const [isAutoWidth, setIsAutoWidth] = useState(false);
   const [isEraser, setIsEraser] = useState(false);
 
-  const [currentColor, setCurrentColor] = useState('#000000');
-  const [currentWidth, setCurrentWidth] = useState(50);
+  const [currentColor, setCurrentColor] = useState(defaultColor);
+  const [currentWidth, setCurrentWidth] = useState(defaultCursorWidth);
 
   const autoWidth = useRef(false);
   const selectedSaturation = useRef(100);
   const selectedLightness = useRef(50);
-  const selectedColor = useRef('#000000');
-  const selectedLineWidth = useRef(50);
+  const selectedColor = useRef(defaultColor);
+  const selectedLineWidth = useRef(defaultCursorWidth);
   const lastX = useRef(0);
   const lastY = useRef(0);
   const hue = useRef(0);
@@ -37,7 +51,7 @@ export const usePainter = ({ bgColor = 'white' }: Props = {}) => {
       return;
     }
     console.error('ctx', canvas, ctx.current);
-    init()
+    init();
     ctx.current.save();
     ctx.current.fillStyle = bgColor;
     ctx.current.fillRect(0, 0, canvas?.width || 0, canvas?.height || 0);
@@ -78,7 +92,7 @@ export const usePainter = ({ bgColor = 'white' }: Props = {}) => {
   }, [canvas]);
 
   const drawNormal = useCallback(
-    (e: any) => {
+    (e: MouseEvent) => {
       if (!isDrawing.current || !ctx.current) return;
 
       if (isRegularPaintMode.current || isEraserMode.current) {
@@ -118,18 +132,17 @@ export const usePainter = ({ bgColor = 'white' }: Props = {}) => {
   }, [canvas]);
 
   const init = useCallback(() => {
-    console.error('init useCallback', canvas, ctx);
-    if (canvas && ctx && ctx.current) {
+    if (canvas && ctx.current) {
       canvas?.addEventListener('mousedown', handleMouseDown);
       canvas?.addEventListener('mousemove', drawNormal);
       canvas?.addEventListener('mouseup', stopDrawing);
       canvas?.addEventListener('mouseout', stopDrawing);
-      canvas.width = window.innerWidth - 196;
-      canvas.height = window.innerHeight;
-      ctx.current.strokeStyle = '#000';
+      canvas.width = Math.min(canvasWidth, maxCanvasWidth);
+      canvas.height = Math.min(canvasHeight, maxCanvasHeight);
+      ctx.current.strokeStyle = defaultColor;
       ctx.current.lineJoin = 'round';
       ctx.current.lineCap = 'round';
-      ctx.current.lineWidth = 10;
+      ctx.current.lineWidth = defaultCursorWidth;
       setIsReady(true);
     }
   }, [drawNormal, handleMouseDown, stopDrawing, canvas]);

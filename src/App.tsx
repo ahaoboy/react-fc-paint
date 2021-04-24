@@ -1,12 +1,23 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import Canvas, { Refs } from './components/Canvas';
 import { Toolbar } from './components/Toolbar';
-import { usePainter } from './hooks/usePainter';
-
-const App = () => {
+import { usePainter, Props as PainterProps } from './hooks/usePainter';
+export type Props = {
+  className?: string | string[];
+} & PainterProps;
+const App: React.FC<Props> = (props = {}) => {
+  const { className = '' } = props;
   const [dateUrl, setDataUrl] = useState('#');
+  const [canvasSize, setCanvasSize] = useState({
+    width: window.innerWidth - 196,
+    height: window.innerHeight,
+  });
+
   const [{ canvas, isReady, ...state }, { init, ...api }] = usePainter({
-    bgColor: 'rgba(0,0,0,0)',
+    bgColor: 'white',
+    canvasWidth: canvasSize.width,
+    canvasHeight: canvasSize.height,
+    ...props,
   });
 
   const handleDownload = useCallback(() => {
@@ -16,18 +27,22 @@ const App = () => {
   const canvasRef = useRef<Refs>(null);
   const toolbarProps = { ...state, ...api, dateUrl, handleDownload };
   useEffect(() => {
-    console.error('canvasRef', canvasRef.current?.getCanvas());
+    const rect = wrapRef.current?.getBoundingClientRect();
+    rect &&
+      setCanvasSize({
+        width: rect.width - 196,
+        height: rect.height,
+      });
     const c = canvasRef.current?.getCanvas?.();
-    console.error('init', c);
     c && api?.setCanvas?.(c);
     init?.();
   }, []);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const classNameStr = ['paint-wrap', [className]].flat().join(' ');
   return (
-    <div className="paint-wrap">
-      {/* <Intro isReady={isReady} init={init} /> */}
+    <div className={classNameStr} ref={wrapRef}>
       <Toolbar {...toolbarProps} />
-      <Canvas width={state.currentWidth} ref={canvasRef} />
-      {/* <Goo /> */}
+      <Canvas cursorWidth={state.currentWidth} ref={canvasRef} />
     </div>
   );
 };
