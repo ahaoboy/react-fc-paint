@@ -1,8 +1,13 @@
+import { useEffect } from 'react';
 import { useCallback, useRef, useState } from 'react';
-export const usePainter = () => {
+type Props = {
+  bgColor?: string;
+};
+export const usePainter = ({ bgColor = 'white' }: Props = {}) => {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | undefined>(
     undefined
   );
+
   const [isReady, setIsReady] = useState(false);
   const [isRegularMode, setIsRegularMode] = useState(true);
   const [isAutoWidth, setIsAutoWidth] = useState(false);
@@ -24,24 +29,42 @@ export const usePainter = () => {
   const isRegularPaintMode = useRef(true);
   const isEraserMode = useRef(false);
 
-  const ctx = useRef(canvas?.getContext?.('2d'));
-
-  const drawOnCanvas = useCallback((event: MouseEvent) => {
-    if (!ctx || !ctx.current) {
+  const ctx = useRef(canvas?.getContext?.('2d')!);
+  ctx.current = canvas?.getContext?.('2d')!;
+  useEffect(() => {
+    console.error('ctx', canvas, ctx.current);
+    if (!ctx || !ctx.current || !canvas) {
       return;
     }
-    ctx.current.beginPath();
-    ctx.current.moveTo(lastX.current, lastY.current);
-    ctx.current.lineTo(event.offsetX, event.offsetY);
-    ctx.current.stroke();
+    console.error('ctx', canvas, ctx.current);
+    init()
+    ctx.current.save();
+    ctx.current.fillStyle = bgColor;
+    ctx.current.fillRect(0, 0, canvas?.width || 0, canvas?.height || 0);
+    ctx.current.restore();
+  }, [bgColor, canvas]);
 
-    [lastX.current, lastY.current] = [event.offsetX, event.offsetY];
-  }, []);
+  const drawOnCanvas = useCallback(
+    (event: MouseEvent) => {
+      if (!ctx || !ctx.current) {
+        return;
+      }
+      ctx.current.beginPath();
+      ctx.current.moveTo(lastX.current, lastY.current);
+      ctx.current.lineTo(event.offsetX, event.offsetY);
+      ctx.current.stroke();
+      [lastX.current, lastY.current] = [event.offsetX, event.offsetY];
+    },
+    [canvas]
+  );
 
-  const handleMouseDown = useCallback((e: MouseEvent) => {
-    isDrawing.current = true;
-    [lastX.current, lastY.current] = [e.offsetX, e.offsetY];
-  }, []);
+  const handleMouseDown = useCallback(
+    (e: MouseEvent) => {
+      isDrawing.current = true;
+      [lastX.current, lastY.current] = [e.offsetX, e.offsetY];
+    },
+    [canvas]
+  );
 
   const dynamicLineWidth = useCallback(() => {
     if (!ctx || !ctx.current) {
@@ -52,7 +75,7 @@ export const usePainter = () => {
     }
     direction.current ? ctx.current.lineWidth++ : ctx.current.lineWidth--;
     setCurrentWidth(ctx.current.lineWidth);
-  }, []);
+  }, [canvas]);
 
   const drawNormal = useCallback(
     (e: any) => {
@@ -92,9 +115,10 @@ export const usePainter = () => {
 
   const stopDrawing = useCallback(() => {
     isDrawing.current = false;
-  }, []);
+  }, [canvas]);
 
   const init = useCallback(() => {
+    console.error('init useCallback', canvas, ctx);
     if (canvas && ctx && ctx.current) {
       canvas?.addEventListener('mousedown', handleMouseDown);
       canvas?.addEventListener('mousemove', drawNormal);
@@ -108,21 +132,21 @@ export const usePainter = () => {
       ctx.current.lineWidth = 10;
       setIsReady(true);
     }
-  }, [drawNormal, handleMouseDown, stopDrawing]);
+  }, [drawNormal, handleMouseDown, stopDrawing, canvas]);
 
   const handleRegularMode = useCallback(() => {
     setIsRegularMode(true);
     isEraserMode.current = false;
     setIsEraser(false);
     isRegularPaintMode.current = true;
-  }, []);
+  }, [canvas]);
 
   const handleSpecialMode = useCallback(() => {
     setIsRegularMode(false);
     isEraserMode.current = false;
     setIsEraser(false);
     isRegularPaintMode.current = false;
-  }, []);
+  }, [canvas]);
 
   const handleColor = (e: any) => {
     setCurrentColor(e.currentTarget.value);
@@ -139,7 +163,7 @@ export const usePainter = () => {
       return;
     }
     ctx.current.clearRect(0, 0, canvas?.width, canvas?.height);
-  }, []);
+  }, [canvas]);
 
   const handleEraserMode = () => {
     autoWidth.current = false;
