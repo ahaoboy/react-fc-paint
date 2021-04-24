@@ -29,7 +29,7 @@ export const Toolbar: React.FC<any> = ({
 }) => {
   return (
     <aside className="toolbar-wrap">
-      <div>
+      <div className="toolbar-up">
         <BrushPreview currentWidth={currentWidth} currentColor={currentColor} />
         <div className="tool-section tool-section--lrg">
           <div className="tool-section">
@@ -150,7 +150,7 @@ export const Toolbar: React.FC<any> = ({
           </div>
         )}
       </div>
-      <div>
+      <div className="toolbar-down">
         <a
           className="btn btn--main btn--block"
           download="image.png"
