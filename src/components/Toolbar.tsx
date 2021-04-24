@@ -3,10 +3,10 @@ import {
   faEraser,
   faMagic,
   faPaintBrush,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
-import { BrushPreview } from "./BrushPreview";
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import { BrushPreview } from './BrushPreview';
 
 export const Toolbar: React.FC<any> = ({
   currentWidth,
@@ -25,9 +25,10 @@ export const Toolbar: React.FC<any> = ({
   isRegularMode,
   isAutoWidth,
   isEraser,
+  brushSize,
 }) => {
   return (
-    <aside className='toolbar-wrap'>
+    <aside className="toolbar-wrap">
       <div>
         <BrushPreview currentWidth={currentWidth} currentColor={currentColor} />
         <div className="tool-section tool-section--lrg">
@@ -53,7 +54,7 @@ export const Toolbar: React.FC<any> = ({
           <div>
             <button
               className={`btn btn--tool ${
-                isRegularMode && !isEraser ? "btn--active" : ""
+                isRegularMode && !isEraser ? 'btn--active' : ''
               }`}
               onClick={handleRegularMode}
             >
@@ -63,7 +64,7 @@ export const Toolbar: React.FC<any> = ({
           <div>
             <button
               className={`btn btn--tool ${
-                !isRegularMode ? "btn--dream-active" : ""
+                !isRegularMode ? 'btn--dream-active' : ''
               }`}
               onClick={handleSpecialMode}
             >
@@ -73,7 +74,7 @@ export const Toolbar: React.FC<any> = ({
           <div>
             <button
               className={`btn btn--tool ${
-                isEraser ? "btn--eraser-active" : ""
+                isEraser ? 'btn--eraser-active' : ''
               }`}
               onClick={handleEraserMode}
             >
@@ -88,11 +89,11 @@ export const Toolbar: React.FC<any> = ({
               type="checkbox"
               onChange={setAutoWidth}
               title="Dynamic brush size"
-            />{" "}
+            />{' '}
             <label
               htmlFor="tool-autowidth"
               className={`btn btn--tool ${
-                isAutoWidth ? "btn--width-active" : ""
+                isAutoWidth ? 'btn--width-active' : ''
               }`}
             >
               <FontAwesomeIcon icon={faArrowsAltH} />
@@ -108,10 +109,10 @@ export const Toolbar: React.FC<any> = ({
             </div>
             <div className="tool-section">
               <input
-                defaultValue="50"
+                defaultValue={brushSize}
                 type="range"
-                min="10"
-                max="90"
+                min="0"
+                max="100"
                 onChange={handleWidth}
               />
             </div>

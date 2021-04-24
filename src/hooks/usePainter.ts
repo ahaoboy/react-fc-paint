@@ -3,7 +3,7 @@ import { useCallback, useRef, useState } from 'react';
 export type Props = {
   bgColor?: string;
   defaultColor?: string;
-  defaultCursorWidth?: number;
+  brushSize?: number;
   canvasWidth?: number;
   canvasHeight?: number;
   maxCanvasWidth?: number;
@@ -12,7 +12,7 @@ export type Props = {
 export const usePainter = ({
   bgColor = 'white',
   defaultColor = 'black',
-  defaultCursorWidth = 15,
+  brushSize = 10,
   canvasWidth = window.innerWidth - 196,
   canvasHeight = window.innerHeight,
   maxCanvasWidth = 1024 * 4,
@@ -28,13 +28,13 @@ export const usePainter = ({
   const [isEraser, setIsEraser] = useState(false);
 
   const [currentColor, setCurrentColor] = useState(defaultColor);
-  const [currentWidth, setCurrentWidth] = useState(defaultCursorWidth);
+  const [currentWidth, setCurrentWidth] = useState(brushSize);
 
   const autoWidth = useRef(false);
   const selectedSaturation = useRef(100);
   const selectedLightness = useRef(50);
   const selectedColor = useRef(defaultColor);
-  const selectedLineWidth = useRef(defaultCursorWidth);
+  const selectedLineWidth = useRef(brushSize);
   const lastX = useRef(0);
   const lastY = useRef(0);
   const hue = useRef(0);
@@ -141,7 +141,7 @@ export const usePainter = ({
       ctx.current.strokeStyle = defaultColor;
       ctx.current.lineJoin = 'round';
       ctx.current.lineCap = 'round';
-      ctx.current.lineWidth = defaultCursorWidth;
+      ctx.current.lineWidth = brushSize;
       setIsReady(true);
     }
 
@@ -228,6 +228,7 @@ export const usePainter = ({
       isRegularMode,
       isAutoWidth,
       isEraser,
+      brushSize,
     },
     {
       init,
