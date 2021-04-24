@@ -26,18 +26,23 @@ const App: React.FC<Props> = (props = {}) => {
   }, [canvas]);
   const canvasRef = useRef<Refs>(null);
   const toolbarProps = { ...state, ...api, dateUrl, handleDownload };
+  const wrapRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const rect = wrapRef.current?.getBoundingClientRect();
-    rect &&
+    const wrapRect = wrapRef.current?.getBoundingClientRect?.();
+    const toolRect = wrapRef.current
+      ?.querySelector('.toolbar-wrap')
+      ?.getBoundingClientRect?.();
+
+    wrapRect &&
       setCanvasSize({
-        width: rect.width - 196,
-        height: rect.height,
+        width: wrapRect.width - (toolRect?.width ?? 196),
+        height: wrapRect.height,
       });
     const c = canvasRef.current?.getCanvas?.();
     c && api?.setCanvas?.(c);
     init?.();
   }, []);
-  const wrapRef = useRef<HTMLDivElement>(null);
+
   const classNameStr = ['paint-wrap', [className]].flat().join(' ');
   return (
     <div className={classNameStr} ref={wrapRef}>

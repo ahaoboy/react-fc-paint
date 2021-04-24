@@ -46,11 +46,9 @@ export const usePainter = ({
   const ctx = useRef(canvas?.getContext?.('2d')!);
   ctx.current = canvas?.getContext?.('2d')!;
   useEffect(() => {
-    console.error('ctx', canvas, ctx.current);
-    if (!ctx || !ctx.current || !canvas) {
+    if (!ctx.current || !canvas) {
       return;
     }
-    console.error('ctx', canvas, ctx.current);
     init();
     ctx.current.save();
     ctx.current.fillStyle = bgColor;
@@ -60,7 +58,7 @@ export const usePainter = ({
 
   const drawOnCanvas = useCallback(
     (event: MouseEvent) => {
-      if (!ctx || !ctx.current) {
+      if (!ctx.current) {
         return;
       }
       ctx.current.beginPath();
@@ -81,7 +79,7 @@ export const usePainter = ({
   );
 
   const dynamicLineWidth = useCallback(() => {
-    if (!ctx || !ctx.current) {
+    if (!ctx.current) {
       return;
     }
     if (ctx.current.lineWidth > 90 || ctx.current.lineWidth < 10) {
