@@ -4,9 +4,10 @@ import { Toolbar } from './components/Toolbar';
 import { usePainter, Props as PainterProps } from './hooks/usePainter';
 export type Props = {
   className?: string | string[];
+  style?: React.CSSProperties;
 } & PainterProps;
 const App: React.FC<Props> = (props = {}) => {
-  const { className = '' } = props;
+  const { className = '', style = {} } = props;
   const [dateUrl, setDataUrl] = useState('#');
   const [canvasSize, setCanvasSize] = useState({
     width: window.innerWidth - 196,
@@ -44,7 +45,7 @@ const App: React.FC<Props> = (props = {}) => {
 
   const classNameStr = ['paint-wrap', [className]].flat().join(' ');
   return (
-    <div className={classNameStr} ref={wrapRef}>
+    <div className={classNameStr} ref={wrapRef} style={style}>
       <Toolbar {...toolbarProps} />
       <Canvas cursorWidth={state.currentWidth} ref={canvasRef} />
     </div>

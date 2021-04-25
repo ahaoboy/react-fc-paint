@@ -1,3 +1,4 @@
+import { isPC } from './../util';
 import { useEffect } from 'react';
 import { useCallback, useRef, useState } from 'react';
 export type Props = {
@@ -8,6 +9,33 @@ export type Props = {
   canvasHeight?: number;
   maxCanvasWidth?: number;
   maxCanvasHeight?: number;
+};
+
+const getPosition = (e: MouseEvent | TouchEvent) => {
+  e.stopPropagation();
+  e.preventDefault();
+  if (e instanceof MouseEvent) {
+    return {
+      x: e.offsetX,
+      y: e.offsetY,
+    };
+  }
+
+  if (e instanceof TouchEvent) {
+    const t = e.changedTouches[0];
+    const rect = (t.target as HTMLCanvasElement).getBoundingClientRect();
+    console.error(t, rect);
+    if (t && rect) {
+      return {
+        x: t.clientX - rect.x,
+        y: t.clientY - rect.y,
+      };
+    }
+  }
+  return {
+    x: 0,
+    y: 0,
+  };
 };
 export const usePainter = ({
   bgColor = 'white',
@@ -57,23 +85,25 @@ export const usePainter = ({
   }, [bgColor, canvas]);
 
   const drawOnCanvas = useCallback(
-    (event: MouseEvent) => {
+    (event: MouseEvent | TouchEvent) => {
       if (!ctx.current) {
         return;
       }
+      const { x, y } = getPosition(event);
       ctx.current.beginPath();
       ctx.current.moveTo(lastX.current, lastY.current);
-      ctx.current.lineTo(event.offsetX, event.offsetY);
+      ctx.current.lineTo(x, y);
       ctx.current.stroke();
-      [lastX.current, lastY.current] = [event.offsetX, event.offsetY];
+      [lastX.current, lastY.current] = [x, y];
     },
     [canvas]
   );
 
   const handleMouseDown = useCallback(
-    (e: MouseEvent) => {
+    (e: MouseEvent | TouchEvent) => {
+      const { x, y } = getPosition(e);
       isDrawing.current = true;
-      [lastX.current, lastY.current] = [e.offsetX, e.offsetY];
+      [lastX.current, lastY.current] = [x, y];
       drawNormal(e);
     },
     [canvas]
@@ -91,7 +121,7 @@ export const usePainter = ({
   }, [canvas]);
 
   const drawNormal = useCallback(
-    (e: MouseEvent) => {
+    (e: MouseEvent | TouchEvent) => {
       if (!isDrawing.current || !ctx.current) return;
 
       if (isRegularPaintMode.current || isEraserMode.current) {
@@ -132,10 +162,30 @@ export const usePainter = ({
 
   const init = useCallback(() => {
     if (canvas && ctx.current) {
-      canvas.addEventListener('mousedown', handleMouseDown);
-      canvas.addEventListener('mousemove', drawNormal);
-      canvas.addEventListener('mouseup', stopDrawing);
-      canvas.addEventListener('mouseout', stopDrawing);
+      if (isPC()) {
+        canvas.addEventListener('mousedown', handleMouseDown, {
+          passive: false,
+        });
+        canvas.addEventListener('mousemove', drawNormal, {
+          passive: false,
+        });
+        canvas.addEventListener('mouseup', stopDrawing, {
+          passive: false,
+        });
+        canvas.addEventListener('mouseout', stopDrawing, {
+          passive: false,
+        });
+      } else {
+        canvas.addEventListener('touchstart', handleMouseDown, {
+          passive: false,
+        });
+        canvas.addEventListener('touchmove', drawNormal, {
+          passive: false,
+        });
+        canvas.addEventListener('touchend', stopDrawing, {
+          passive: false,
+        });
+      }
       canvas.width = Math.min(canvasWidth, maxCanvasWidth);
       canvas.height = Math.min(canvasHeight, maxCanvasHeight);
       ctx.current.strokeStyle = defaultColor;
@@ -147,10 +197,16 @@ export const usePainter = ({
 
     return () => {
       if (canvas) {
-        canvas.removeEventListener('mousedown', handleMouseDown);
-        canvas.removeEventListener('mousemove', drawNormal);
-        canvas.removeEventListener('mouseup', stopDrawing);
-        canvas.removeEventListener('mouseout', stopDrawing);
+        if (isPC()) {
+          canvas.removeEventListener('mousedown', handleMouseDown);
+          canvas.removeEventListener('mousemove', drawNormal);
+          canvas.removeEventListener('mouseup', stopDrawing);
+          canvas.removeEventListener('mouseout', stopDrawing);
+        } else {
+          canvas.removeEventListener('touchstart', handleMouseDown);
+          canvas.removeEventListener('touchmove', drawNormal);
+          canvas.removeEventListener('touchend', stopDrawing);
+        }
       }
     };
   }, [drawNormal, handleMouseDown, stopDrawing, canvas]);
