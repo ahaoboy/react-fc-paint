@@ -1,12 +1,24 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
-import Canvas, { Refs } from './components/Canvas';
+import React, {
+  useState,
+  ForwardRefRenderFunction,
+  useImperativeHandle,
+  useCallback,
+  useEffect,
+  useRef,
+  forwardRef,
+} from 'react';
+import Canvas, { Refs as CanvasRefs } from './components/Canvas';
 import { Toolbar } from './components/Toolbar';
 import { usePainter, Props as PainterProps } from './hooks/usePainter';
 export type Props = {
   className?: string | string[];
   style?: React.CSSProperties;
 } & PainterProps;
-const App: React.FC<Props> = (props = {}) => {
+
+export type Refs = {
+  getCanvas: () => HTMLCanvasElement | null | undefined;
+};
+const App: ForwardRefRenderFunction<Refs, Props> = (props = {}, ref) => {
   const { className = '', style = {} } = props;
   const [dateUrl, setDataUrl] = useState('#');
   const [canvasSize, setCanvasSize] = useState({
@@ -25,9 +37,12 @@ const App: React.FC<Props> = (props = {}) => {
     if (!canvas) return;
     setDataUrl(canvas.toDataURL?.('image/png'));
   }, [canvas]);
-  const canvasRef = useRef<Refs>(null);
+  const canvasRef = useRef<CanvasRefs>(null);
   const toolbarProps = { ...state, ...api, dateUrl, handleDownload };
   const wrapRef = useRef<HTMLDivElement>(null);
+  useImperativeHandle(ref, () => ({
+    getCanvas: () => canvasRef.current?.getCanvas?.(),
+  }));
   useEffect(() => {
     const wrapRect = wrapRef.current?.getBoundingClientRect?.();
     const toolRect = wrapRef.current
@@ -52,4 +67,4 @@ const App: React.FC<Props> = (props = {}) => {
   );
 };
 
-export default App;
+export default forwardRef(App);
