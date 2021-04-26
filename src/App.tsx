@@ -45,12 +45,9 @@ const App: ForwardRefRenderFunction<Refs, Props> = (props = {}, ref) => {
   }));
   useEffect(() => {
     const wrapRect = wrapRef.current?.getBoundingClientRect?.();
-    const toolRect = wrapRef.current
-      ?.querySelector('.toolbar-wrap')
-      ?.getBoundingClientRect?.();
     wrapRect &&
       setCanvasSize({
-        width: wrapRect.width - (toolRect?.width ?? 196),
+        width: wrapRect.width,
         height: wrapRect.height,
       });
     const c = canvasRef.current?.getCanvas?.();

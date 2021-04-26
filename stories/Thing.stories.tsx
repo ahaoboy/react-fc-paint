@@ -12,7 +12,7 @@ export const Default = () => {
   const ref = useRef<any>();
   useEffect(() => {
     document.addEventListener('click', () => {
-      console.error(ref.current.getCanvas?.());
+      // console.error(ref.current.getCanvas?.());
     });
   }, []);
 

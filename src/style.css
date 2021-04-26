@@ -4,8 +4,31 @@
   --color-text: #1d1d1d;
   --color-background: #ffffff;
 }
-.toolbar-wrap {
+
+.toolbar-hide {
+  position: absolute;
+  cursor: pointer;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.toolbar-show {
+  position: absolute;
+  cursor: pointer;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: lightgray;
+}
+.toolbar-out-wrap {
+  position: absolute;
+  height: 100%;
   width: 196px;
+}
+.toolbar-wrap {
+  height: 100%;
+  width: 100%;
+  position: relative;
   background-color: #f1f1f1;
   display: flex;
   flex-direction: column;
@@ -13,6 +36,7 @@
   align-items: center;
 }
 .paint-wrap {
+  position: relative;
   display: flex;
   width: 100%;
   height: 100%;
